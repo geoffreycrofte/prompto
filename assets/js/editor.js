@@ -86,6 +86,7 @@ const editor = new EditorJS({
 	},
 	data: insertedData()
 });
+
 const autoscroll = function(vel) {
 	let y = 0;
 
@@ -97,21 +98,39 @@ const autoscroll = function(vel) {
 		prompteditor.scrollTo(0, y);
 	}, 100 / parseInt(vel) );
 };
+
+const getSettings = async function(editorData) {
+	
+	let settings = {
+		"settings" : {
+			"bgcolor": inBgcolor.value,
+			"txtcolor": inTxtcolor.value,
+			"fontsize": inFontsize.value,
+			"velocity": inVelocity.value
+		},
+		"editorjs" : ''
+	};
+
+	if ( editorData ) {
+		settings.editorjs = editorData;
+		return JSON.stringify( settings );
+	} else {
+		await editor.save().then((outputData) => {
+			settings.editorjs = outputData;
+			return JSON.stringify( settings );
+		});
+	}
+};
+
 const saveall = function(ed) {
 	ed.save().then((outputData) => {
 
-		localStorage.setItem(
-			'prompter-datas', 
-			JSON.stringify({
-				"settings" : {
-					"bgcolor": inBgcolor.value,
-					"txtcolor": inTxtcolor.value,
-					"fontsize": inFontsize.value,
-					"velocity": inVelocity.value
-				},
-				"editorjs" : outputData
-			})
-		);
+		getSettings(outputData).then(function(outputSettings){
+			localStorage.setItem(
+				'prompter-datas',
+				outputSettings
+			);
+		});
 
 		_html.setAttribute('style', '--prompt-bgcolor:'+inBgcolor.value+';--prompt-txtcolor:'+inTxtcolor.value+';--prompt-fontsize:'+inFontsize.value+'em;' )
 
@@ -121,7 +140,6 @@ const saveall = function(ed) {
 }
 
 let ASinter;
-
 const _html = document.documentElement;
 const inBgcolor = document.getElementById('bgcolor');
 const inTxtcolor = document.getElementById('txtcolor');
@@ -130,6 +148,7 @@ const inVelocity = document.getElementById('velocity');
 const prompteditor = document.getElementById('editorjs');
 const btnSave = document.getElementById('save');
 const btnPrompt = document.getElementById('prompt');
+const btnExport = document.getElementById('export');
 const FSclass = 'mode-fullscreen';
 
 /**
@@ -176,4 +195,25 @@ document.addEventListener('fullscreenchange', function(ev) {
 
 prompteditor.addEventListener('click', function(){
 	clearInterval(ASinter);
+});
+
+/**
+ * Export
+ */
+
+btnExport.addEventListener('click', function(){
+	let filename = 'prompto.json';
+
+	getSettings().then( (dataStr) => {
+		// WHY THE FUCK IS THIS UNDEFINED??????
+		console.log(dataStr);
+		if ( dataStr ) {
+		//
+			let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+			let linkElement = document.createElement('a');
+			linkElement.setAttribute('href', dataUri);
+			linkElement.setAttribute('download', filename);
+			linkElement.click();	
+	    }
+	});
 });
