@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Prompter</title>
+	<title>Prompto — PWA Prompter</title>
 
 	<link rel="stylesheet" href="assets/css/main.css">
 </head>
@@ -38,14 +38,26 @@
 
 		<div class="tools">
 			<p class="main-actions">
-				<button class="btn-secondary" id="save" type="button">Save</button>
-				<button class="btn-primary" id="prompt" type="button">Prompt</button>
+				<button class="btn-secondary" id="save" type="button">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M17 21V13H7V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M7 3V8H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+
+					Save
+				</button>
+				<button class="btn-primary" id="prompt" type="button">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M23 7L16 12L23 17V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M14 5H3C1.89543 5 1 5.89543 1 7V17C1 18.1046 1.89543 19 3 19H14C15.1046 19 16 18.1046 16 17V7C16 5.89543 15.1046 5 14 5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+					Prompt
+				</button>
 			</p>
 
 			<div class="settings">
-				<h2>Prompt settings</h2>
-				<p class="info">Appearance of your prompter.</p>
-
+				<h2>Prompto Settings</h2>
 				<form name="color-setting" action="#">
 					<p>
 						<label for="bgcolor">Background</label>
@@ -67,14 +79,56 @@
 						<input type="number" name="velocity" id="velocity" value="6">
 					</p>
 				</form>
+
+				<form name="prompt-setting" action="#">
+					<p>
+						<label for="delay">Start Delay</label>
+						<input type="number" name="delay" id="delay" value="5">&nbsp;&nbsp;<abbr title="seconds">s</abbr>
+					</p>
+					<p>
+						<span class="label-like">Mirror Effects</span>
+						<span>
+							<input type="checkbox" name="mirror-x" id="mirror-x">
+							<label for="mirror-x">
+								<span>Mirror H.</span>
+							</label>
+						</span>
+						<span>
+							<input type="checkbox" name="mirror-y" id="mirror-y">
+							<label for="mirror-y">
+								<span>Mirror v.</span>
+							</label>
+						</span>
+					</p>
+				</form>
 			</div>
 
 			<div class="settings">
 				<h2>Tools</h2>
-				<p class="info">Export and import your texts to save things locally.</p>
+				<p class="info">Export settings and content to save these on your computer. You can re-import these later.</p>
 
 				<p>
-					<button type="button" id="export">Export</button>
+					<button type="button" id="export" class="btn-secondary">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M17 8L12 3L7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+						Export
+					</button>
+
+					<button type="button" id="import" class="btn-secondary">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+						Import
+					</button>
+				</p>
+
+				<p class="info mt-16">
+					<strong>Prompto is free.</strong> Please consider <a href="https://buymeacoffee.com/geoffreycrofte" target="_blank">buying me a coffee</a>, that would be awesome 💕
 				</p>
 			</div>
 		</div>
