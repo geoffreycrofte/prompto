@@ -1,0 +1,31 @@
+{
+  "name": "prompto",
+  "version": "1.0.0",
+  "description": "A PWA Prompter",
+  "main": "index.html",
+  "dependencies": {
+    "@editorjs/editorjs": "^2.19.1",
+    "@editorjs/header": "^2.6.1",
+    "@editorjs/list": "^1.6.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geoffreycrofte/prompto.git"
+  },
+  "keywords": [
+    "Prompter",
+    "videotool",
+    "videomaker",
+    "teleprompter"
+  ],
+  "author": "Geoffrey Crofte",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/geoffreycrofte/prompto/issues"
+  },
+  "homepage": "https://github.com/geoffreycrofte/prompto#readme"
+}

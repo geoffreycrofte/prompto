@@ -1,6 +1,6 @@
-import EditorJS from 'https://cdn.skypack.dev/@editorjs/editorjs';
-import Header from 'https://cdn.skypack.dev/@editorjs/header';
-import List from 'https://cdn.skypack.dev/@editorjs/list';
+import EditorJS from '@editorjs/editorjs';
+import Header from '@editorjs/header';
+import List from '@editorjs/list';
 
 const insertedData = function() {
 	let defaultData = { 
