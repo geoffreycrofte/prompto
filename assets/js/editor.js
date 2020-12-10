@@ -1,9 +1,32 @@
-import EditorJS from '@editorjs/editorjs';
-import Header from '@editorjs/header';
-import List from '@editorjs/list';
+import EditorJS from 'https://cdn.skypack.dev/@editorjs/editorjs';
+import Header from 'https://cdn.skypack.dev/@editorjs/header';
+import List from 'https://cdn.skypack.dev/@editorjs/list';
+
+let ASinter;
+const _html = document.documentElement;
+const inBgcolor = document.getElementById('bgcolor');
+const inTxtcolor = document.getElementById('txtcolor');
+const inFontsize = document.getElementById('fontsize');
+const inVelocity = document.getElementById('velocity');
+const inDelay = document.getElementById('delay');
+const inMirrorX = document.getElementById('mirror-x');
+const inMirrorY = document.getElementById('mirror-y');
+const prompteditor = document.getElementById('editorjs');
+const btnSave = document.getElementById('save');
+const btnPrompt = document.getElementById('prompt');
+const btnExport = document.getElementById('export');
+const btnImport = document.getElementById('import');
+const FSclass = 'mode-fullscreen';
+const storageName = 'prompter-datas';
 
 const insertedData = function() {
-	let defaultData = { 
+	let data = getStorage();
+	
+	if ( data && data.editorjs ) {
+		return data.editorjs;
+	}
+
+	return { 
 		"time": 1550476186479,
 		"blocks": [
 		  {
@@ -67,17 +90,21 @@ const insertedData = function() {
 	   ],
 	   "version": "2.8.1"
 	};
+};
 
-	if ( localStorage.getItem('prompter-datas') ) {
-		let data = JSON.parse(localStorage.getItem('prompter-datas'));
-
-		if ( data.editorjs ) {
-			return data.editorjs;
-		}
+const getStorage = function() {
+	if ( ! window.localStorage ) {
+		console.warn( 'Your browser does not support Local Storage API' );
+		return false;
 	}
 
-	return defaultData;
-};
+	if ( localStorage.getItem(storageName) ) {
+		let data = JSON.parse(localStorage.getItem(storageName));
+		return data;
+	}
+
+	return null;
+}
 
 const editor = new EditorJS({
   holder: 'editorjs',
@@ -113,14 +140,40 @@ const autoscroll = function(vel) {
 };
 
 const initCoundown = function(counter, speed, autoscroll) {
-	let i = 0;
+	let i = 0,
+		regCounter = parseInt(counter);
+
+	if ( parseInt(counter) === 0 ) {
+		autoscroll(speed);
+		return;
+	}
+
+	let counterDiv = document.createElement("div");
+	counterDiv.setAttribute( 'aria-live', 'assertive' );
+	counterDiv.className = 'prompto-counter';
+	counterDiv.innerHTML = regCounter;
+	
+	prompteditor.append(counterDiv);
+
+	setTimeout( function() {
+		document.querySelector('.prompto-counter').classList.add('is-visible');
+	}, 200 );
+
 	let counting = setInterval( function() {
 		i++;
-		if ( typeof autoscroll === 'function' && i === parseInt( counter ) ) {
+		regCounter--;
+
+		document.querySelector('.prompto-counter').innerHTML = regCounter;
+
+		if ( typeof autoscroll === 'function' && i >= parseInt( counter ) ) {
 			clearInterval( counting );
 			counting = null; // Old trick for IE, don't know if still needed.
 
+			document.querySelector('.prompto-counter').classList.remove('is-visible');
 			autoscroll(speed);
+			setTimeout( function() {
+				document.querySelector('.prompto-counter').remove();
+			}, 400 );
 		}
 	}, 1000 );
 }
@@ -156,7 +209,7 @@ const saveall = function(ed) {
 
 		getSettings(outputData).then(function(outputSettings){
 			localStorage.setItem(
-				'prompter-datas',
+				storageName,
 				outputSettings
 			);
 		});
@@ -177,22 +230,6 @@ const saveall = function(ed) {
 	  console.log('Saving failed: ', error)
 	});
 }
-
-let ASinter;
-const _html = document.documentElement;
-const inBgcolor = document.getElementById('bgcolor');
-const inTxtcolor = document.getElementById('txtcolor');
-const inFontsize = document.getElementById('fontsize');
-const inVelocity = document.getElementById('velocity');
-const inDelay = document.getElementById('delay');
-const inMirrorX = document.getElementById('mirror-x');
-const inMirrorY = document.getElementById('mirror-y');
-const prompteditor = document.getElementById('editorjs');
-const btnSave = document.getElementById('save');
-const btnPrompt = document.getElementById('prompt');
-const btnExport = document.getElementById('export');
-const btnImport = document.getElementById('import');
-const FSclass = 'mode-fullscreen';
 
 /**
  * Saving Data
@@ -228,6 +265,7 @@ btnPrompt.addEventListener('click', function() {
 document.addEventListener('fullscreenchange', function(ev) {
 	if ( _html.classList.contains(FSclass) ) {
 		_html.classList.remove(FSclass);
+		clearInterval(ASinter);
 	} else {
 		_html.classList.add(FSclass);
 	}
@@ -237,21 +275,26 @@ prompteditor.addEventListener('click', function(){
 	clearInterval(ASinter);
 });
 
+prompteditor.querySelector('.codex-editor__redactor').addEventListener('click', function(){
+	clearInterval(ASinter);
+});
+
 /**
  * Export
  */
 btnExport.addEventListener('click', function(){
-	let filename = 'prompto.json';
 
-	if ( localStorage.getItem('prompter-datas') ) {
-		let dataStr = localStorage.getItem('prompter-datas');
-		if ( dataStr ) {
-			let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-			let linkElement = document.createElement('a');
-			linkElement.setAttribute('href', dataUri);
-			linkElement.setAttribute('download', filename);
-			linkElement.click();	
-		}
+	let filename = 'prompto.json';
+	let dataStr = getStorage();
+
+	if ( dataStr ) {
+		let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+		let linkElement = document.createElement('a');
+		linkElement.setAttribute('href', dataUri);
+		linkElement.setAttribute('download', filename);
+		linkElement.click();
+	} else {
+		console.warn('Error while getting the data.');
 	}
 });
 
@@ -260,54 +303,59 @@ btnExport.addEventListener('click', function(){
  */
 btnImport.addEventListener('click', function(){
 	let linkElement = document.createElement('input');
-		linkElement.type = 'file';
-		linkElement.name = 'importFile';
-		linkElement.accept = 'application/json';
 
-		linkElement.click();
+	linkElement.type = 'file';
+	linkElement.name = 'importFile';
+	linkElement.accept = 'application/json';
 
-		linkElement.addEventListener('change', function(e){
-			// Even if it's not a multiple input, files is an array.
-			let file = e.target.files[0];
+	linkElement.click();
 
-			if ( file.type && file.type.indexOf('json') === -1 ) {
-				console.info( 'File is not a JSON file.', file.type, file );
-				return;
+	linkElement.addEventListener('change', function(e){
+		// Even if it's not a multiple input, files is an array.
+		let file = e.target.files[0];
+
+		if ( file.type && file.type.indexOf('json') === -1 ) {
+			console.info( 'File is not a JSON file.', file.type, file );
+			return;
+		}
+
+		const reader = new FileReader();
+
+		// When the file is loaded.
+		reader.addEventListener('load', function(e) {
+			let data = e.target.result;
+
+			if ( typeof atob !== 'function' ) {
+				console.info( 'Browser doesn’t support reading' )
 			}
 
-			const reader = new FileReader();
+			// That's the dataURI format.
+			// console.log( data );
+			// We need to split and remove the first part
+			// "data:application/json;base64,"
+			data = JSON.parse( atob( data.split(',')[1] ) );
+			console.log(data);
 
-			// When the file is loaded.
-			reader.addEventListener('load', function(e) {
-				let data = e.target.result;
+			// TODO :
+			// Update the Settings form
+			
+			
+			// Update the editor blocks.
+			editor.render( data.editorjs ); // WORKING !! :D
 
-				if ( typeof atob !== 'function' ) {
-					console.info( 'Browser doesn’t support reading' )
-				}
-
-				// That's the dataURI format.
-				// console.log( data );
-				// We need to split and remove the first part
-				// "data:application/json;base64,"
-				data = JSON.parse( atob( data.split(',')[1] ) );
-				console.log(data);
-
-				// TODO :
-				// Update the Settings form
-				
-				
-				// Update the editor blocks.
-				editor.render( data.editorjs ); // WORKING !! :D
-
-			});
-
-			// Do something with progress.
-			reader.addEventListener('progress', function(e) {
-				if (e.loaded && e.total) {
-					const percent = (e.loaded / e.total) * 100;
-					console.log(`Progress: ${Math.round(percent)}`);
-				}
-			});
-			reader.readAsDataURL(file);
 		});
+
+		// Do something with progress.
+		reader.addEventListener('progress', function(e) {
+			if (e.loaded && e.total) {
+				const percent = (e.loaded / e.total) * 100;
+				console.log(`Progress: ${Math.round(percent)}`);
+			}
+		});
+		reader.readAsDataURL(file);
+	});
 });
+
+setInterval( function() {
+	saveall(editor);
+}, 20000); // 20s

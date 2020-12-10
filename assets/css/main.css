@@ -24,6 +24,19 @@
 	--textinfo: #666;
 }
 
+* {
+	box-sizing: border-box;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+svg {
+	max-width: 100%;
+}
+
 html,
 body {
 	padding: 0;
@@ -252,10 +265,54 @@ button {
 	background: inherit;
 	color: inherit;
 	font-size: var( --prompt-fontsize, 3em);
-	padding: 80px;
+	padding: 80vh 80px 80px 80px;
 }
 
 .mode-fullscreen .codex-editor .ce-block__content {
 	max-width: 60ch!important;
 	margin: 0 auto;
+}
+
+/* Remove remove spellcheck style on fullscreen */
+.mode-fullscreen ::spelling-error {
+	text-decoration: none;
+}
+
+.prompto-counter {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	width: 240px;
+	height: 240px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 0;
+	color: white;
+	font-size: 120px;
+	font-weight: bold;
+	transform: translateX(-50%) translateY(-50%) scale(.5);
+	opacity: 0;
+	background: rgba(0,0,0,.9);
+	z-index: 1000;
+	transition: all .3s;
+	border-radius: 24px;
+}
+
+.prompto-counter.is-visible {
+	transform: translateX(-50%) translateY(-50%) scale(1);
+	opacity: 1;
+	animation: blink 1s -.2s linear infinite;
+}
+
+@keyframes blink {
+	0%, 100% {
+		font-size: 80px;
+		color: rgba(255,255,255, 0);
+	}
+
+	10% {
+		font-size: 120px;
+		color: rgba(255,255,255, 1);
+	}
 }
