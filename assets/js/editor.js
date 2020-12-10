@@ -9,8 +9,8 @@ const inTxtcolor = document.getElementById('txtcolor');
 const inFontsize = document.getElementById('fontsize');
 const inVelocity = document.getElementById('velocity');
 const inDelay = document.getElementById('delay');
-const inMirrorX = document.getElementById('mirror-x');
-const inMirrorY = document.getElementById('mirror-y');
+const inMirrorx = document.getElementById('mirrorx');
+const inMirrory = document.getElementById('mirrory');
 const prompteditor = document.getElementById('editorjs');
 const btnSave = document.getElementById('save');
 const btnPrompt = document.getElementById('prompt');
@@ -107,7 +107,7 @@ const getStorage = function() {
 }
 
 const editor = new EditorJS({
-  holder: 'editorjs',
+	holder: 'editorjs',
 	autofocus: true,
 	tools: { 
 		header: {
@@ -124,7 +124,12 @@ const editor = new EditorJS({
 			inlineToolbar: true 
 		}
 	},
-	data: insertedData()
+	data: insertedData(),
+	onReady: function() {
+		document.querySelector('.codex-editor__redactor').addEventListener('click', function(){
+			clearInterval(ASinter);
+		});
+	}
 });
 
 const autoscroll = function(vel) {
@@ -187,8 +192,8 @@ const getSettings = async function(editorData) {
 			"fontsize": inFontsize.value,
 			"velocity": inVelocity.value,
 			"delay": inDelay.value,
-			"mirrorx": inMirrorX.checked,
-			"mirrory": inMirrorY.checked
+			"mirrorx": inMirrorx.checked,
+			"mirrory": inMirrory.checked
 		},
 		"editorjs" : ''
 	};
@@ -216,11 +221,11 @@ const saveall = function(ed) {
 
 		let mirror = 'none';
 
-		if ( inMirrorX.checked ) {
+		if ( inMirrorx.checked ) {
 			mirror = 'rotateX(-180deg)';
 		}
 
-		if ( inMirrorY.checked ) {
+		if ( inMirrory.checked ) {
 			mirror = mirror === 'none' ? 'rotateY(-180deg)' : mirror + ' rotateY(-180deg)';
 		}
 
@@ -272,10 +277,6 @@ document.addEventListener('fullscreenchange', function(ev) {
 });
 
 prompteditor.addEventListener('click', function(){
-	clearInterval(ASinter);
-});
-
-prompteditor.querySelector('.codex-editor__redactor').addEventListener('click', function(){
 	clearInterval(ASinter);
 });
 
@@ -334,15 +335,29 @@ btnImport.addEventListener('click', function(){
 			// We need to split and remove the first part
 			// "data:application/json;base64,"
 			data = JSON.parse( atob( data.split(',')[1] ) );
-			console.log(data);
 
-			// TODO :
 			// Update the Settings form
-			
+			if ( data.settings ) {
+				Object.keys( data.settings ).forEach(key => {
+					let element = document.getElementById(key);
+					if ( ! element ) {
+						console.warn( key + ' input doesn’t exist.');
+						return;
+					}
+
+					if ( element.type == 'checkbox' ) {
+						element.checked = data.settings[key];
+					} else {
+						element.value = data.settings[key];
+					}
+
+				});
+			}
 			
 			// Update the editor blocks.
-			editor.render( data.editorjs ); // WORKING !! :D
-
+			if ( data.editorjs ) {
+				editor.render( data.editorjs ); // WORKING !! :D
+			}
 		});
 
 		// Do something with progress.
