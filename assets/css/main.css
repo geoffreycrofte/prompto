@@ -223,6 +223,41 @@ button {
 	background: var(--paper);
 }
 
+/* Messaging */
+.prompto-message {
+	z-index: 1000;
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	opacity: 0;
+	background: rgba(255, 255, 255, .5);
+	transition: all .3s ease-in-out;
+}
+
+.prompto-message div {
+	padding: 1em;
+	border-radius: 8px;
+	font-size: 1.5em;
+	color: white;
+	background: var(--primarylight);
+	transform: scale(0);
+	transition: all .3s ease-in-out;
+}
+
+.prompto-message.is-visible div {
+	transform: scale(1);
+}
+
+.prompto-message.is-visible {
+	outline: none;
+	opacity: 1;
+}
+
 .codex-editor {
 	width: 90%;
 	max-width: 860px;

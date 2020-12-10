@@ -183,6 +183,27 @@ const initCoundown = function(counter, speed, autoscroll) {
 	}, 1000 );
 }
 
+const messagePop = function(message, type){
+	let messageDiv = document.createElement("div");
+	messageDiv.setAttribute( 'aria-live', 'assertive' );
+	messageDiv.className = 'prompto-message ' + ( type || 'normal' );
+	messageDiv.innerHTML = '<div class="msg-content">' + ( message || '…' ) + '</div>';
+	messageDiv.setAttribute('tabindex', '-1');
+
+	console.log(messageDiv);
+	document.querySelector('body').append(messageDiv);
+
+	setTimeout( function() {
+		let messagediv = document.querySelector('.prompto-message');
+		messagediv.classList.add('is-visible');
+		messagediv.focus();
+	}, 200 );
+
+	let focused = document.activeElement;
+}
+
+messagePop('Ploppy', 'error');
+
 const getSettings = async function(editorData) {
 
 	let settings = {
