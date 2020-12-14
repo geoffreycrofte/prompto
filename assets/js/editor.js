@@ -2,7 +2,9 @@ import EditorJS from 'https://cdn.skypack.dev/@editorjs/editorjs';
 import Header from 'https://cdn.skypack.dev/@editorjs/header';
 import List from 'https://cdn.skypack.dev/@editorjs/list';
 
-let ASinter;
+let AutoScrollInterval;
+let AutoSaveInterval;
+let lastFocusedElement;
 const _html = document.documentElement;
 const inBgcolor = document.getElementById('bgcolor');
 const inTxtcolor = document.getElementById('txtcolor');
@@ -94,6 +96,7 @@ const insertedData = function() {
 
 const getStorage = function() {
 	if ( ! window.localStorage ) {
+		messagePop( 'Browser can’t save', 'Apparently your browser doesn’t support localStorage. Use Chrome or Firefox, or any compatible browser.', 'error' );
 		console.warn( 'Your browser does not support Local Storage API' );
 		return false;
 	}
@@ -127,7 +130,7 @@ const editor = new EditorJS({
 	data: insertedData(),
 	onReady: function() {
 		document.querySelector('.codex-editor__redactor').addEventListener('click', function(){
-			clearInterval(ASinter);
+			clearInterval(AutoScrollInterval);
 		});
 	}
 });
@@ -135,18 +138,21 @@ const editor = new EditorJS({
 const autoscroll = function(vel) {
 	let y = 0;
 
-	clearInterval(ASinter);
+	clearInterval(AutoScrollInterval);
 	prompteditor.scrollTo(0, 0);
 
-	ASinter = setInterval( function() {
+	AutoScrollInterval = setInterval( function() {
 		y = y + 1;
 		prompteditor.scrollTo(0, y);
 	}, 100 / parseInt(vel) );
 };
 
 const initCoundown = function(counter, speed, autoscroll) {
-	let i = 0,
-		regCounter = parseInt(counter);
+	let i = 0;
+	let regCounter = parseInt(counter);
+
+	// Reset scrolling position to be sure.
+	prompteditor.scrollTo(0, 0);
 
 	if ( parseInt(counter) === 0 ) {
 		autoscroll(speed);
@@ -183,26 +189,46 @@ const initCoundown = function(counter, speed, autoscroll) {
 	}, 1000 );
 }
 
-const messagePop = function(message, type){
+const messagePop = function(message, detail, type){
 	let messageDiv = document.createElement("div");
 	messageDiv.setAttribute( 'aria-live', 'assertive' );
-	messageDiv.className = 'prompto-message ' + ( type || 'normal' );
-	messageDiv.innerHTML = '<div class="msg-content">' + ( message || '…' ) + '</div>';
+	messageDiv.className = 'prompto-message' + ( type ? ' is-' + type : '' );
+	messageDiv.innerHTML = '<div class="msg-content">' + getIcon(type) + ( message || '…' ) + ( detail ? '<p>'+ detail + '</p>' : '' ) + '</div>';
 	messageDiv.setAttribute('tabindex', '-1');
 
-	console.log(messageDiv);
 	document.querySelector('body').append(messageDiv);
 
 	setTimeout( function() {
 		let messagediv = document.querySelector('.prompto-message');
 		messagediv.classList.add('is-visible');
 		messagediv.focus();
-	}, 200 );
+	}, 100 );
 
-	let focused = document.activeElement;
+	lastFocusedElement = document.activeElement;
+	messageDiv.addEventListener('click', function(e){
+		if ( e.target === messageDiv ) {
+			messageClose();
+		}
+	});
 }
 
-messagePop('Ploppy', 'error');
+const messageClose = function() {
+	let message = document.querySelector('.prompto-message');
+	message.classList.remove('is-visible');
+
+	setTimeout( function() {
+		message.remove();
+		lastFocusedElement.focus();
+	}, 300 );
+}
+
+const getIcon = function(type) {
+	if ( type === 'error' ) {
+		return '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.29 3.86001L1.82002 18C1.64539 18.3024 1.55299 18.6453 1.55201 18.9945C1.55103 19.3437 1.64151 19.6871 1.81445 19.9905C1.98738 20.2939 2.23675 20.5468 2.53773 20.7239C2.83871 20.901 3.18082 20.9962 3.53002 21H20.47C20.8192 20.9962 21.1613 20.901 21.4623 20.7239C21.7633 20.5468 22.0127 20.2939 22.1856 19.9905C22.3585 19.6871 22.449 19.3437 22.448 18.9945C22.4471 18.6453 22.3547 18.3024 22.18 18L13.71 3.86001C13.5318 3.56611 13.2807 3.32313 12.9812 3.15449C12.6817 2.98585 12.3438 2.89726 12 2.89726C11.6563 2.89726 11.3184 2.98585 11.0188 3.15449C10.7193 3.32313 10.4683 3.56611 10.29 3.86001V3.86001Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 9V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+	} else {
+		return '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.709 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18457 2.99721 7.13633 4.39828 5.49707C5.79935 3.85782 7.69279 2.71538 9.79619 2.24015C11.8996 1.76491 14.1003 1.98234 16.07 2.86" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+	}
+}
 
 const getSettings = async function(editorData) {
 
@@ -230,7 +256,7 @@ const getSettings = async function(editorData) {
 	}
 };
 
-const saveall = function(ed) {
+const saveall = function(ed, autoSave) {
 	ed.save().then((outputData) => {
 
 		getSettings(outputData).then(function(outputSettings){
@@ -250,10 +276,19 @@ const saveall = function(ed) {
 			mirror = mirror === 'none' ? 'rotateY(-180deg)' : mirror + ' rotateY(-180deg)';
 		}
 
-		_html.setAttribute('style', '--prompt-bgcolor:'+inBgcolor.value+';--prompt-txtcolor:'+inTxtcolor.value+';--prompt-fontsize:'+inFontsize.value+'em;--prompt-mirror:'+mirror )
+		_html.setAttribute('style', '--prompt-bgcolor:'+inBgcolor.value+';--prompt-txtcolor:'+inTxtcolor.value+';--prompt-fontsize:'+inFontsize.value+'em;--prompt-mirror:'+mirror );
+
+		if ( ! autoSave || (autoSave && autoSave !== true ) ) {
+			messagePop('Well saved', 'Prompto is now saving automatically every 20 seconds.',  'success');
+			clearInterval( AutoSaveInterval ); // To avoid interval duplication.
+			AutoSaveInterval = setInterval( function() {
+				saveall(editor, true);
+			}, 20000); // 20s
+		}
 
 	}).catch((error) => {
-	  console.log('Saving failed: ', error)
+		messagePop('Error while saving', 'Can’t tell where it’s from, try later maybe…',  'error');
+		console.warn('Saving failed: ', error)
 	});
 }
 
@@ -271,7 +306,7 @@ btnPrompt.addEventListener('click', function() {
 	if ( ! document.fullscreenElement ) {
 		
 		// Save data before full screen.
-		saveall(editor);
+		saveall(editor, true); // Fake auto save (true) to avoid message.
 
 		let velocity = inVelocity.value ? inVelocity.value : velocity;
 		let counter = inDelay.value ? inDelay.value : 0;
@@ -291,14 +326,23 @@ btnPrompt.addEventListener('click', function() {
 document.addEventListener('fullscreenchange', function(ev) {
 	if ( _html.classList.contains(FSclass) ) {
 		_html.classList.remove(FSclass);
-		clearInterval(ASinter);
+		clearInterval(AutoScrollInterval);
 	} else {
 		_html.classList.add(FSclass);
 	}
 });
 
 prompteditor.addEventListener('click', function(){
-	clearInterval(ASinter);
+	clearInterval(AutoScrollInterval);
+});
+
+/**
+ * Exit modal
+ */
+document.addEventListener('keydown', function(e){
+	if ( document.querySelector('.prompto-message') && e.key === 'Escape' ) {
+		messageClose();
+	}
 });
 
 /**
@@ -316,6 +360,7 @@ btnExport.addEventListener('click', function(){
 		linkElement.setAttribute('download', filename);
 		linkElement.click();
 	} else {
+		messagePop('Oops, can’t export', 'Try to save before exporting your work.',  'error');
 		console.warn('Error while getting the data.');
 	}
 });
@@ -391,7 +436,3 @@ btnImport.addEventListener('click', function(){
 		reader.readAsDataURL(file);
 	});
 });
-
-setInterval( function() {
-	saveall(editor);
-}, 20000); // 20s

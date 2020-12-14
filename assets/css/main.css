@@ -1,27 +1,40 @@
 :root {
+	--primarylighter: #EBC8DA;
 	--primarylight: #A66186;
 	--primary: #843B62;
 	--primarydark: #652748;
 
-	--darker: #0B032D;
-	--dark: #2A1B67;
+	--darklighter: #B9B1DB;
 	--darklight: #4C3D87;
+	--dark: #2A1B67;
+	--darker: #0B032D;
 	
-	--washeddark: #4E2D43;
-	--washed: #74546A;
+	--washedlighter: #EDD5E6;
 	--washedlight: #98738C;
+	--washed: #74546A;
+	--washeddark: #4E2D43;
 
-	--accentdark: #DB5E5D;
-	--accent: #F67E7D;
+	--accentlighter: #FDE8E8;
 	--accentlight: #F9B6B5;
+	--accent: #F67E7D;
+	--accentdark: #DB5E5D;
 
-	--paperdark: #EF8C5A;
-	--paper: #FFB995;
-	--paperlight: #FFDDCC;
 	--paperlighter: #FFF2EB;
+	--paperlight: #FFDDCC;
+	--paper: #FFB995;
+	--paperdark: #EF8C5A;
 
+	/* Utilities */
 	--text: #444444;
 	--textinfo: #666;
+
+	--errordark: #BE2A29;
+	--error: #FB6161;
+	--errorlight: var(--accentlighter);
+
+	--successdark: #23A064;
+	--success: #48DE96;
+	--successlight: #D4FFEB;
 }
 
 * {
@@ -240,13 +253,123 @@ button {
 }
 
 .prompto-message div {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 320px;
+	max-width: 100%;
+	height: 280px;
 	padding: 1em;
 	border-radius: 8px;
 	font-size: 1.5em;
-	color: white;
-	background: var(--primarylight);
+	color: var(--primarylight);
+	background: white;
 	transform: scale(0);
 	transition: all .3s ease-in-out;
+	box-shadow: 0 4px 80px -32px rgba(152, 115, 140, .8);
+}
+
+.prompto-message svg {
+	width: 72px;
+	height: 72px;
+	margin-bottom: 16px;
+}
+
+.prompto-message path {
+	stroke-width: 1.2;
+}
+
+.prompto-message.is-success path {
+	animation: check 1s .2s 1 forwards ease-in-out;
+	stroke-dasharray : 2px, 35;
+	opacity: 0;
+}
+
+.prompto-message.is-error path:nth-child(1) {
+	animation: error 1s .2s 1 forwards ease-in-out;
+	transform-origin: 12px 12px;
+	opacity 0;
+}
+.prompto-message.is-error path:nth-child(2) {
+	animation: pool 1s .2s 1 forwards ease-in-out;
+	opacity 0;
+}
+.prompto-message.is-error path:nth-child(3) {
+	animation: boing 1s .2s 1 forwards linear;
+	opacity 0;
+}
+
+@keyframes check {
+	0% {
+		stroke-dasharray : 2px, 35;
+	}
+	100% {
+		stroke-dasharray : 56px, 35;
+		opacity: 1;
+	}
+}
+
+@keyframes error {
+	0% {
+		opacity: 0;
+		transform: scale(.8);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1) rotate(0);
+	}
+}
+
+@keyframes pool {
+	0% {
+		transform: translateY(0);
+		opacity: 1;
+	}
+	12% {
+		transform: translateY(4px);
+	}
+	40%, 100% {
+		transform: translateY(0);
+	}
+}
+
+@keyframes boing {
+	0% {
+		transform: translateY(-4px);
+		opacity: 1;
+	}
+	25% {
+		transform: translateY(0);
+	}
+	55% {
+		transform: translateY(-2px);
+	}
+	75% {
+		transform: translateY(0);
+	}
+	85% {
+		transform: translateY(-1px);
+	}
+	100% {
+		transform: translateY(0);
+	}
+}
+
+.prompto-message div p {
+	margin-bottom: 0;
+	text-align: center;
+	font-size: .7em;
+	font-weight: normal;
+	color: var(--text);
+}
+
+.prompto-message.is-error div {
+	color: var(--errordark);
+}
+
+.prompto-message.is-success div {
+	color: var(--successdark);
 }
 
 .prompto-message.is-visible div {
