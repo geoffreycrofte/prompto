@@ -354,6 +354,10 @@ btnExport.addEventListener('click', function(){
 	let dataStr = getStorage();
 
 	if ( dataStr ) {
+		if ( typeof dataStr === "object" ) {
+			dataStr = JSON.stringify( dataStr );
+		}
+
 		let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
 		let linkElement = document.createElement('a');
 		linkElement.setAttribute('href', dataUri);

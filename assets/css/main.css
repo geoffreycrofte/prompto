@@ -403,6 +403,36 @@ button {
 	top: 16px!important;
 }
 
+.ce-block--selected .ce-block__content,
+.ce-toolbar__settings-btn {
+	background: var(--paperlight);
+	border-radius: 4px;
+}
+
+.ce-toolbar__settings-btn {
+	color: var(--primary);
+}
+
+.mode-fullscreen [class^="ce-settings__"] {
+	font-size: 1rem;
+}
+
+.ct::after,
+.ct::before {
+	background: var(--primarydark);
+}
+
+.cdx-settings-button:hover,
+.ce-settings__button:hover {
+	background: var(--paperlight);
+}
+
+.ce-settings {
+	background: #FFF;
+	color: var(--primary);
+	border-color: var(--paperlighter);
+}
+
 .mode-fullscreen [id="editorjs"] {
 	position: fixed;
 	top: 0;
