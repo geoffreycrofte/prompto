@@ -288,7 +288,7 @@ const saveall = function(ed, autoSave) {
 
 	}).catch((error) => {
 		messagePop('Error while saving', 'Can’t tell where it’s from, try later maybe…',  'error');
-		console.warn('Saving failed: ', error)
+		console.warn('Saving failed: ', error);
 	});
 }
 
@@ -303,34 +303,46 @@ btnSave.addEventListener('click', function() {
  * Full Screen / Prompt
  */
 btnPrompt.addEventListener('click', function() {
+	document.fullscreenElement = document.fullscreenElement || document.mozFullscreenElement
+            || document.msFullscreenElement || document.webkitFullscreenDocument;
+  	document.exitFullscreen = document.exitFullscreen || document.mozExitFullscreen
+            || document.msExitFullscreen || document.webkitExitFullscreen;
+
 	if ( ! document.fullscreenElement ) {
 		
 		// Save data before full screen.
 		saveall(editor, true); // Fake auto save (true) to avoid message.
 
-		let velocity = inVelocity.value ? inVelocity.value : velocity;
-		let counter = inDelay.value ? inDelay.value : 0;
-
 		// Request fullscreen.
-		_html.requestFullscreen();
+		let toFS = _html;
 
-		// Countdown
-		initCoundown(
-			counter,
-			velocity,
-			autoscroll // Fallback function.
-		);
+		toFS.requestFullscreen = toFS.requestFullscreen || toFS.mozRequestFullscreen
+          || toFS.msRequestFullscreen || toFS.webkitRequestFullscreen;
+		
+
+		toFS.requestFullscreen().then(function(){}).catch( function(err) {
+			messagePop('Error with Full Screen', 'Apparently your browser isn’t compatible 😅',  'error');
+			console.log('Error attempting to enable full-screen mode:', err.message, err.name);
+		});
 	}
 });
 
-document.addEventListener('fullscreenchange', function(ev) {
+const onFullScreenChange = function(event){
 	if ( _html.classList.contains(FSclass) ) {
 		_html.classList.remove(FSclass);
 		clearInterval(AutoScrollInterval);
 	} else {
 		_html.classList.add(FSclass);
+
+		// Countdown
+		let velocity = inVelocity.value ? inVelocity.value : velocity;
+		let counter = inDelay.value ? inDelay.value : 0;
+		initCoundown( counter, velocity, autoscroll );
 	}
-});
+};
+
+document.addEventListener('webkitfullscreenchange', onFullScreenChange, false);
+document.addEventListener('fullscreenchange', onFullScreenChange, false);
 
 prompteditor.addEventListener('click', function(){
 	clearInterval(AutoScrollInterval);
