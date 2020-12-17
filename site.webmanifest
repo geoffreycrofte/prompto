@@ -13,7 +13,14 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#ffffff",
+    "theme_color": "#843B62",
     "background_color": "#ffffff",
-    "display": "standalone"
+    "display": "standalone",
+    "start_url": "https://prompto.crofte.fr",
+    "url" : "https://prompto.crofte.fr",
+    "lang": "English",
+    "categories" : [
+        "productivity",
+        "utilities"
+    ]
 }
