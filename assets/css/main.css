@@ -35,6 +35,10 @@
 	--successdark: #23A064;
 	--success: #48DE96;
 	--successlight: #D4FFEB;
+
+	--cubic: cubic-bezier(0.785, 0.135, 0.150, 0.860);
+	--anim-duration: 0.4s;
+	--sidebar-size: 320px;
 }
 
 * {
@@ -61,8 +65,108 @@ body {
 }
 
 body {
-	display: grid;
-	grid-template-columns: 1fr clamp(240px, 320px, 30%);
+	display: flex;
+	overflow-x: hidden;
+}
+
+/* Utility */
+.sr-only {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	padding: 0 !important;
+	margin: -1px !important;
+	border: 0 !important;
+	clip: rect(1px, 1px, 1px, 1px) !important;
+	-webkit-clip-path: inset(50%) !important;
+	clip-path: inset(50%) !important;
+	overflow: hidden !important;
+	white-space: nowrap !important;
+}
+
+/* Animation on SHOWING all the stuff */
+.settings,
+.main-actions,
+.main-actions button,
+.main-actions span,
+.main-actions svg,
+[id='toggle-settings'],
+[id='toggle-settings'] svg {
+	transition: all var(--anim-duration) var(--anim-duration) var(--cubic);
+}
+
+.toolbar {
+	transition: all var(--anim-duration) var(--anim-duration) var(--cubic),
+				margin-right var(--anim-duration) var(--cubic);
+}
+
+.main-actions button:nth-child(1) {
+	transition: all var(--anim-duration) var(--anim-duration) var(--cubic),
+				margin-left var(--anim-duration) var(--cubic);
+}
+
+
+/* Animations on HIDDING all the stuff */
+.sidebar-is-hidden .settings,
+.sidebar-is-hidden .main-actions,
+.sidebar-is-hidden .main-actions button,
+.sidebar-is-hidden .main-actions span,
+.sidebar-is-hidden .main-actions svg,
+.sidebar-is-hidden [id='toggle-settings'],
+.sidebar-is-hidden [id='toggle-settings'] svg {
+	transition: all var(--anim-duration) var(--cubic);
+}
+
+.sidebar-is-hidden .toolbar {
+	transform: translateX(100%);
+	transition: all var(--anim-duration) var(--cubic),
+				margin-right var(--anim-duration) var(--anim-duration) var(--cubic);
+	margin-right: calc(var(--sidebar-size) * -1);
+}
+
+.sidebar-is-hidden [id='toggle-settings'] {
+	right: 0;
+}
+
+.sidebar-is-hidden [id='toggle-settings'] svg {
+	transform: rotate(0);
+}
+
+.sidebar-is-hidden .toolbar .settings {
+	opacity: 0;
+}
+
+.sidebar-is-hidden .main-actions {
+	position: sticky;
+	top: 80px;
+	transform: translateX(-160px);
+}
+
+.sidebar-is-hidden .main-actions button {
+	width: 48px;
+	min-height: 48px;
+	border-radius: 24px;
+	padding: 8px 12px;
+	transform: translateX(-32px) translateY(32px);
+}
+
+.sidebar-is-hidden .main-actions button:nth-child(1) {
+	margin-left: calc(var(--sidebar-size) * -2);
+	transition: all var(--anim-duration) var(--cubic),
+				margin-left var(--anim-duration) var(--anim-duration) var(--cubic);
+}
+
+.sidebar-is-hidden .main-actions button:nth-child(2) {
+	transform: translateX(-84px) translateY(-32px);
+}
+
+.sidebar-is-hidden .main-actions svg {
+	margin: 0;
+}
+
+.sidebar-is-hidden .main-actions span {
+	width: 0;
+	opacity: 0;
 }
 
 a {
@@ -91,6 +195,8 @@ a {
 }
 
 .toolbar {
+	width: var(--sidebar-size);
+	flex-shrink: 0;
 	padding: 16px;
 	background: white;
 	z-index: 2;
@@ -106,6 +212,12 @@ a {
 .toolbar .main-actions {
 	font-size: 1em;
 	text-align: center;
+}
+
+.main-actions span {
+	width: 100%;
+	overflow: hidden;
+	white-space: nowrap;
 }
 
 .toolbar h2,
@@ -144,6 +256,24 @@ a {
 .toolbar .info {
 	margin-top: -8px;
 	color: var(--textinfo);
+}
+
+/* Toolbar Open/close button */
+[id='toggle-settings'] {
+	position: absolute;
+	top: 24px;
+	right: var(--sidebar-size);
+	background: white;
+	border: 0;
+	padding: 8px;
+	border-radius: 4px 0 0 4px;
+	color: var(--washed);
+}
+
+[id='toggle-settings'] svg {
+	height: 16px;
+	width: 16px;
+	transform: rotate(180deg);
 }
 
 form p {
@@ -197,11 +327,20 @@ span label {
 	display: inline-flex;
 	align-items: center;
 	padding: 8px 16px;
+	min-height: 35px;
 	font-weight: bold;
 	font-size: 1em;
 	border: 0;
 	border-radius: 4px;
 	cursor: pointer;
+}
+
+[id="save"] {
+	width: 96px;
+}
+
+[id="prompt"] {
+	width: 116px;
 }
 
 [class^="btn-"] svg {
@@ -234,6 +373,11 @@ button {
 .btn-secondary:focus {
 	color: var(--primarydark);
 	background: var(--paper);
+}
+
+/* Editor */
+.editor-container {
+	flex-basis: 100%;
 }
 
 /* Messaging */

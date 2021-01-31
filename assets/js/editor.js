@@ -19,6 +19,7 @@ const btnPrompt = document.getElementById('prompt');
 const btnExport = document.getElementById('export');
 const btnImport = document.getElementById('import');
 const FSclass = 'mode-fullscreen';
+const Hiddenclass = 'sidebar-is-hidden';
 const storageName = 'prompter-datas';
 
 const insertedData = function() {
@@ -349,11 +350,42 @@ prompteditor.addEventListener('click', function(){
 });
 
 /**
- * Exit modal
+ * Exit modal or close Full Screen
  */
 document.addEventListener('keydown', function(e){
 	if ( document.querySelector('.prompto-message') && e.key === 'Escape' ) {
 		messageClose();
+	}
+
+	if ( document.querySelector('.' + FSclass) && e.key === 'Escape' ) {
+		clearInterval(AutoScrollInterval);
+		document.querySelector('.' + FSclass).classList.remove(FSclass);
+	}
+});
+
+/**
+ * Close/Open Settings
+ */
+let settings_button = document.createElement('button');
+settings_button.type = 'button';
+settings_button.id = 'toggle-settings';
+
+document.querySelector('.toolbar').after(settings_button);
+
+settings_button = document.getElementById('toggle-settings');
+settings_button.setAttribute('aria-controls', 'toolbar');
+settings_button.setAttribute('aria-expanded', 'true');
+settings_button.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="presentation"><path d="M19 12H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="sr-only closeopen-text">Close Settings</span>';
+
+settings_button.addEventListener('click', function(){
+	if ( document.querySelector( '.' + Hiddenclass ) ) {
+		document.querySelector( '.' + Hiddenclass ).classList.remove(Hiddenclass);
+		document.querySelector('.closeopen-text').innerHTML = 'Close Settings';
+		this.setAttribute('aria-expanded', 'true');
+	} else {
+		document.querySelector('body').classList.add(Hiddenclass);
+		document.querySelector('.closeopen-text').innerHTML = 'Open Settings';
+		this.setAttribute('aria-expanded', 'false');
 	}
 });
 
@@ -409,7 +441,7 @@ btnImport.addEventListener('click', function(){
 			let data = e.target.result;
 
 			if ( typeof atob !== 'function' ) {
-				console.info( 'Browser doesn’t support reading' )
+				console.info( 'Browser doesn’t support reading' );
 			}
 
 			// That's the dataURI format.
@@ -442,13 +474,95 @@ btnImport.addEventListener('click', function(){
 			}
 		});
 
-		// Do something with progress.
+		// Do something with progress (?)
 		reader.addEventListener('progress', function(e) {
 			if (e.loaded && e.total) {
 				const percent = (e.loaded / e.total) * 100;
 				console.log(`Progress: ${Math.round(percent)}`);
 			}
 		});
+
 		reader.readAsDataURL(file);
 	});
 });
+
+/**
+ * Speech recognition.
+ * @see https://mdn.github.io/web-speech-api/speech-color-changer
+ * Thank MDN for the great documentation.
+ */
+
+if ( typeof( window.SpeechRecognition ) !== 'undefined' || typeof( window.webkitSpeechRecognition ) !== 'undefined' ) {
+	const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+	const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+	const SpeechRecognitionEvent = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
+
+	const words = [ 'Let’s go', 'stop it' ];
+	const grammar = '#JSGF V1.0; grammar words; public <word> = ' + words.join(' | ') + ' ;'
+
+	let recognition = new SpeechRecognition();
+	let speechRecognitionList = new SpeechGrammarList();
+	speechRecognitionList.addFromString(grammar, 1);
+	recognition.grammars = speechRecognitionList;
+	recognition.continuous = false;
+	recognition.lang = 'en-US';
+	recognition.interimResults = false;
+	recognition.maxAlternatives = 4;
+
+	document.body.onclick = function() {
+	  recognition.start();
+	  console.log(recognition);
+	  // Recognition fallback/event available:
+	  // onstart
+	  // onaudiostart
+	  // onsoundstart
+	  // onspeechstart
+	  // onaudioend
+	  // onsoundend
+	  // onspeechend	
+	  console.log('Ready to receive a command.');
+	}
+
+	recognition.onresult = function(event) {
+	  // The SpeechRecognitionEvent results property returns a SpeechRecognitionResultList object
+	  // The SpeechRecognitionResultList object contains SpeechRecognitionResult objects.
+	  // It has a getter so it can be accessed like an array
+	  // The first [0] returns the SpeechRecognitionResult at the last position.
+	  // Each SpeechRecognitionResult object contains SpeechRecognitionAlternative objects that contain individual results.
+	  // These also have getters so they can be accessed like arrays.
+	  // The second [0] returns the SpeechRecognitionAlternative at position 0.
+	  // We then return the transcript property of the SpeechRecognitionAlternative object
+	  console.log(event.results);
+	  let word = event.results[0][0].transcript;
+	  console.log('Result received: ' + word + '.');
+	  console.log('Confidence: ' + Math.round( event.results[0][0].confidence * 100 ) + '%');
+	}
+
+	// Isn't executed at any moment…
+	recognition.onspeechend = function() {
+	  recognition.stop();
+	  console.info('Speech Recognition Ended');
+	}
+
+	recognition.onsoundend = function() {
+		console.info('Recognition: Sound Ended');
+	}
+
+	recognition.onaudioend = function() {
+		console.info('Recognition: Audio Ended');
+	}
+
+	recognition.onend = function() {
+		console.info('Recognition: Ended');
+	}
+
+	recognition.onnomatch = function(event) {
+	  console.info( "I didn't recognise that color." );
+	}
+
+	recognition.onerror = function(event) {
+	  console.warn( 'Error occurred in recognition: ' + event.error );
+	}
+} else {
+	console.info('Speech Recognition isn’t supported by your browser yet.');
+}
