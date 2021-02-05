@@ -1,0 +1,80 @@
+{
+    "name": "Nobs - Share Buttons",
+    "short_name": "Nobs",
+    "icons": [
+        {
+            "src": "/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/android-chrome-384x384.png",
+            "sizes": "384x384",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#067FA5",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "start_url": "https://sharebuttons.social/",
+    "url" : "https://sharebuttons.social",
+    "lang": "English",
+    "screenshots" : [
+        {
+            "src": "/assets/img/screenshot-1.jpg",
+            "sizes": "1280x800",
+            "type": "image/jpg"
+        },
+        {
+            "src": "/assets/img/screenshot-2.jpg",
+            "sizes": "1280x800",
+            "type": "image/jpg"
+        }
+    ],
+    "categories" : [
+        "navigation",
+        "lifestyle",
+        "personalization",
+        "productivity",
+        "social",
+        "utilities"
+    ],
+    "shortcuts": [
+        {
+            "name": "Features", 
+            "description": "A list of plugin features.",
+            "url": "/features.html",
+            "icons": [
+                {
+                    "src": "/assets/img/picto-feat.png",
+                    "type": "image/png",
+                    "purpose": "any"
+                }
+            ]
+        },
+        {
+            "name": "Pricing", 
+            "description": "The plugin offers",
+            "url": "/free-plugin.html",
+            "icons": [
+                {
+                    "src": "/assets/img/picto-price.png",
+                    "type": "image/png",
+                    "purpose": "any"
+                }
+            ]
+        },
+        {
+            "name": "Nobs on Twitter", 
+            "description": "Our Twitter account.",
+            "url": "https://twitter.com/wpsharebuttons",
+            "icons": [
+                {
+                    "src": "/assets/img/picto-twitter.png",
+                    "type": "image/png",
+                    "purpose": "any"
+                }
+            ]
+        }
+    ] 
+}

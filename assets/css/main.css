@@ -358,10 +358,11 @@ button {
 	background: var(--primary);
 }
 
-.btn-primary:hover,
-.btn-primary:focus {
+button.btn-primary:hover,
+button.btn-primary:focus {
 	background: var(--primarydark);
 	color: var(--paperlight);
+	transition: all .3s linear!important;
 }
 
 .btn-secondary {
@@ -369,10 +370,11 @@ button {
 	background: var(--paperlight);
 }
 
-.btn-secondary:hover,
-.btn-secondary:focus {
+button.btn-secondary:hover,
+button.btn-secondary:focus {
 	color: var(--primarydark);
 	background: var(--paper);
+	transition: all .3s linear!important;
 }
 
 /* Editor */
